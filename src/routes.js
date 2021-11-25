@@ -12,8 +12,10 @@ const Profile = {
     "vacation-per-year": 4,
     "value-hour": 75
 }
-const jobs = [
 
+const Job = {
+
+    data: [
     {
         id: 1,
         name: "Pizzaria Guloso",
@@ -21,7 +23,6 @@ const jobs = [
         "total-hours": 10,
         createdAt: Date.now()
     },
-
     {
         id: 2,
         name: "OneTwo Project",
@@ -29,54 +30,60 @@ const jobs = [
         "total-hours": 20,
         createdAt: Date.now()
     }
+    ],
 
-]
+    controllers: {
+        index(req,res){
+            const updatedJobs = Job.data.map((job) => {
+                const remaining = Job.services.remainingDays(job)
+                const status = remaining <= 0 ? 'done' : 'progress'
+                return {
+                    ...job, // os ... irá 'espalhar' os atributos do job num novo objeto, sem necessidade de declarar um a um
+                    remaining,
+                    status,
+                    budget: Profile["value-hour"] * job["total-hours"]
+                        }
+            })
+            
+            return res.render(basePath + "index", { jobs: updatedJobs })    
+        },
 
+        create(req,res){
+            const lastId = Job.data[Job.data-1]?.id || 0; // trabalhando posição de array
 
-// funções
-function remainingDays(job){
-    const remainingDays = (job["total-hours"] / job["daily-hours"]).toFixed()
-    const createdDate = new Date(job.createdAt)
-    const dueDay = createdDate.getDate() + Number(remainingDays)
-    const dueDateInMs = createdDate.setDate(dueDay)
-    const timeDiffInMs = dueDateInMs - Date.now()
-    const dayInMs = 1000 * 60 * 60 * 24
-    const dayDiff = Math.ceil(timeDiffInMs / dayInMs) // arredonda para cima
-    return dayDiff
+            Job.data.push({ // adiciona no array os valores do req.body, mas tbm poderia ser só jobs.push(job)
+                id: lastId + 1,
+                name: req.body.name,
+                "daily-hours": req.body["daily-hours"],
+                "total-hours": req.body["total-hours"],
+                createdAt: Date.now() // atribui o momento exato em formato timestamp
+            }) 
+
+            return res.redirect("/") // para finalizar o fluxo, retorna para o /
+        }
+    },
+
+    services: {
+        remainingDays(job){
+            const remainingDays = (job["total-hours"] / job["daily-hours"]).toFixed()
+            const createdDate = new Date(job.createdAt)
+            const dueDay = createdDate.getDate() + Number(remainingDays)
+            const dueDateInMs = createdDate.setDate(dueDay)
+            const timeDiffInMs = dueDateInMs - Date.now()
+            const dayInMs = 1000 * 60 * 60 * 24
+            const dayDiff = Math.ceil(timeDiffInMs / dayInMs) // arredonda para cima
+            
+            return dayDiff
+        }
+    }
+    
 }
 
 
 // rotas
-routes.get("/", (req, res) => {
-    
-    const updatedJobs = jobs.map((job) => {
-        const remaining = remainingDays(job)
-        const status = remaining <= 0 ? 'done' : 'progress'
-        return {
-            ...job, // os ... irá 'espalhar' os atributos do job num novo objeto, sem necessidade de declarar um a um
-            remaining,
-            status,
-            budget: Profile["value-hour"] * job["total-hours"]
-        }
-    })
-
-    return res.render(basePath + "index", { jobs: updatedJobs })    
-})
+routes.get("/", Job.controllers.index)
 routes.get("/job", (req, res) => res.render(basePath + "job"))
-routes.post("/job", (req, res) => {
-    
-    const lastId = jobs[jobs.length-1]?.id || 0; // trabalhando posição de array
-
-    jobs.push({ // adiciona no array os valores do req.body, mas tbm poderia ser só jobs.push(job)
-        id: lastId + 1,
-        name: req.body.name,
-        "daily-hours": req.body["daily-hours"],
-        "total-hours": req.body["total-hours"],
-        createdAt: Date.now() // atribui o momento exato em formato timestamp
-    }) 
-
-    return res.redirect("/") // para finalizar o fluxo, retorna para o /
-})
+routes.post("/job", Job.controllers.create)
 routes.get("/job/edit", (req, res) => res.render(basePath + "job-edit"))
 routes.get("/profile", (req, res) => res.render(basePath + "profile", { Profile }))
 routes.get("/index", (req, res) => res.redirect("/"))
