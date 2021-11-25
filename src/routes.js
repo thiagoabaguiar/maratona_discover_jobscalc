@@ -1,3 +1,4 @@
+// constantes
 const express = require("express");
 const routes = express.Router()
 const basePath = __dirname + "/views/"
@@ -8,58 +9,59 @@ const Profile = {
     "monthly-budget": 5000,
     "days-per-week": 5,
     "hours-per-day": 8,
-    "vacation-per-year": 4
+    "vacation-per-year": 4,
+    "value-hour": 75
 }
 const jobs = [
 
     {
         id: 1,
         name: "Pizzaria Guloso",
-        "daily-hours": 8,
-        "total-hours": 45,
+        "daily-hours": 10,
+        "total-hours": 10,
         createdAt: Date.now()
     },
 
     {
         id: 2,
         name: "OneTwo Project",
-        "daily-hours": 5,
-        "total-hours": 35,
+        "daily-hours": 4,
+        "total-hours": 20,
         createdAt: Date.now()
     }
 
 ]
 
 
+// funções
+function remainingDays(job){
+    const remainingDays = (job["total-hours"] / job["daily-hours"]).toFixed()
+    const createdDate = new Date(job.createdAt)
+    const dueDay = createdDate.getDate() + Number(remainingDays)
+    const dueDateInMs = createdDate.setDate(dueDay)
+    const timeDiffInMs = dueDateInMs - Date.now()
+    const dayInMs = 1000 * 60 * 60 * 24
+    const dayDiff = Math.ceil(timeDiffInMs / dayInMs) // arredonda para cima
+    return dayDiff
+}
 
 
-
+// rotas
 routes.get("/", (req, res) => {
     
     const updatedJobs = jobs.map((job) => {
-        
-        const remainingDays = (job["total-hours"] / job["daily-hours"]).toFixed()
-        const createdDate = new Date(job.createdAt)
-        const dueDay = createdDate.getDate() + Number(remainingDays)
-
-        return job
-    })
-    
-
-
-
-
-
-    return res.render(basePath + "index", { jobs })    
+        const remaining = remainingDays(job)
+        const status = remaining <= 0 ? 'done' : 'progress'
+        return {
+            ...job, // os ... irá 'espalhar' os atributos do job num novo objeto, sem necessidade de declarar um a um
+            remaining,
+            status,
+            budget: Profile["value-hour"] * job["total-hours"]
+        }
     })
 
-
-
-
-
-
-
-
+    return res.render(basePath + "index", { jobs: updatedJobs })    
+})
 routes.get("/job", (req, res) => res.render(basePath + "job"))
 routes.post("/job", (req, res) => {
     
@@ -80,4 +82,6 @@ routes.get("/profile", (req, res) => res.render(basePath + "profile", { Profile 
 routes.get("/index", (req, res) => res.redirect("/"))
 routes.get("/index.html", (req, res) => res.redirect("/"))
 
+
+// export rotas
 module.exports = routes;
