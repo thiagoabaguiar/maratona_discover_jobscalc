@@ -117,6 +117,25 @@ const Job = {
                 "daily-hours": req.body["daily-hours"],
                 "total-hours": req.body["total-hours"]
             }
+
+            Job.data = Job.data.map(job => {
+
+                if(Number(job.id) === Number(jobId)){
+                    job = updatedJob
+                }
+
+                return job
+            })
+
+            return res.redirect('/job/' + jobId)
+        },
+
+        delete(req,res){
+            const jobId = req.params.id
+
+            Job.data = Job.data.filter(job => Number(job.id) !== Number(jobId))
+
+            return res.redirect('/')
         }
     },
 
@@ -149,6 +168,7 @@ routes.get  ("/job/:id", Job.controllers.show)
 routes.post ("/profile", Profile.controllers.update)
 routes.post ("/job", Job.controllers.save)
 routes.post ("/job/:id", Job.controllers.update)
+routes.post ("/job/delete/:id", Job.controllers.delete)
 
 
 
