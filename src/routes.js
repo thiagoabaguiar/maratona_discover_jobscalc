@@ -2,15 +2,29 @@
 const express = require("express");
 const routes = express.Router()
 const basePath = __dirname + "/views/"
+
 const Profile = {
-    name: "Thiago Aguiar",
-    avatar: "https://github.com/thiagoabaguiar.png",
-    "price-per-hour": 75,
-    "monthly-budget": 5000,
-    "days-per-week": 5,
-    "hours-per-day": 8,
-    "vacation-per-year": 4,
-    "value-hour": 75
+    
+    data: {
+        name: "Thiago Aguiar",
+        avatar: "https://github.com/thiagoabaguiar.png",
+        "price-per-hour": 75,
+        "monthly-budget": 5000,
+        "days-per-week": 5,
+        "hours-per-day": 8,
+        "vacation-per-year": 4,
+        "value-hour": 75
+    },
+
+    controllers: {
+        index(req,res){
+            return res.render(basePath + "profile", { profile: Profile })
+        },
+
+        update(){
+            return
+        }
+    }
 }
 
 const Job = {
@@ -41,7 +55,7 @@ const Job = {
                     ...job, // os ... irá 'espalhar' os atributos do job num novo objeto, sem necessidade de declarar um a um
                     remaining,
                     status,
-                    budget: Profile["value-hour"] * job["total-hours"]
+                    budget: Profile.data["value-hour"] * job["total-hours"]
                         }
             })
             
@@ -49,6 +63,10 @@ const Job = {
         },
 
         create(req,res){
+            return res.render(basePath + "job")
+        },
+
+        save(req,res){
             const lastId = Job.data[Job.data-1]?.id || 0; // trabalhando posição de array
 
             Job.data.push({ // adiciona no array os valores do req.body, mas tbm poderia ser só jobs.push(job)
@@ -60,6 +78,10 @@ const Job = {
             }) 
 
             return res.redirect("/") // para finalizar o fluxo, retorna para o /
+        },
+        
+        edit(req,res){
+            return res.render(basePath + "job-edit")
         }
     },
 
@@ -82,12 +104,10 @@ const Job = {
 
 // rotas
 routes.get("/", Job.controllers.index)
-routes.get("/job", (req, res) => res.render(basePath + "job"))
-routes.post("/job", Job.controllers.create)
-routes.get("/job/edit", (req, res) => res.render(basePath + "job-edit"))
-routes.get("/profile", (req, res) => res.render(basePath + "profile", { Profile }))
-routes.get("/index", (req, res) => res.redirect("/"))
-routes.get("/index.html", (req, res) => res.redirect("/"))
+routes.get("/job", Job.controllers.create)
+routes.post("/job", Job.controllers.save)
+routes.get("/job/edit", Job.controllers.edit)
+routes.get("/profile", Profile.controllers.index)
 
 
 // export rotas
