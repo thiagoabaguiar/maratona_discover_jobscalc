@@ -8,7 +8,7 @@ const ProfileController = require("./controllers/ProfileController");
 // rotas
 routes.get("/", JobController.index);
 routes.get("/profile", ProfileController.index);
-routes.get("/job", JobController.create);
+routes.get("/job", JobController.view);
 routes.get("/job/:id", JobController.show);
 
 routes.post("/profile", ProfileController.update);

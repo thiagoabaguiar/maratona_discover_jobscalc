@@ -1,10 +1,11 @@
 const Job = require("../model/Job")
 const Profile = require("../model/Profile")
-const jobUtils = require ("../utils/jobUtils")
+const jobUtils = require("../utils/JobUtils")
 
 module.exports = {
     index(req, res) {
         const jobs = Job.get()
+        const profile = Profile.get()
         const updatedJobs = jobs.map((job) => {
             const remaining = jobUtils.remainingDays(job);
             const status = remaining <= 0 ? "done" : "progress";
@@ -12,20 +13,18 @@ module.exports = {
                 ...job, // os ... irá 'espalhar' os atributos do job num novo objeto, sem necessidade de declarar um a um
                 remaining,
                 status,
-                budget: jobUtils.calculateBudget(
-                    job,
-                    Profile.get()["price-per-hour"]
-                ),
+                budget: jobUtils.calculateBudget(job, profile["price-per-hour"]),
             };
         });
         return res.render("index", { jobs: updatedJobs });
     },
 
-    create(req, res) {
+    view(req, res) {
         return res.render("job");
     },
 
     show(req, res) {
+        const profile = Profile.get()
         const jobId = req.params.id;
         const jobs = Job.get()
         const job = jobs.find((job) => Number(job.id) === Number(jobId));
@@ -34,17 +33,14 @@ module.exports = {
             return res.send("Job não encontrado!");
         }
 
-        job.budget = jobUtils.calculateBudget(
-            job,
-            Profile.update()["price-per-hour"]
-        );
+        job.budget = jobUtils.calculateBudget(job, profile["price-per-hour"]);
 
         return res.render("job-edit", { job });
     },
 
     save(req, res) {
         const jobs = Job.get()
-        const lastId = jobs[jobs - 1]?.id || 0; // trabalhando posição de array
+        const lastId = jobs[jobs.length - 1]?.id || 0; // trabalhando posição de array
         jobs.push({
             // adiciona no array os valores do req.body, mas tbm poderia ser só jobs.push(job)
             id: lastId + 1,
@@ -53,6 +49,7 @@ module.exports = {
             "total-hours": req.body["total-hours"],
             createdAt: Date.now(), // atribui o momento exato em formato timestamp
         });
+
         return res.redirect("/"); // para finalizar o fluxo, retorna para o /
     },
 
@@ -72,22 +69,23 @@ module.exports = {
             "total-hours": req.body["total-hours"],
         };
 
-        jobs = jobs.map((job) => {
+        const newJob = jobs.map((job) => {
             if (Number(job.id) === Number(jobId)) {
                 job = updatedJob;
             }
-
             return job;
         });
 
-        return res.redirect("/job/" + jobId);
+        Job.update(newJob)
+
+        // return res.redirect("/job/" + jobId);
+        return res.redirect("/")
     },
 
     delete(req, res) {
         const jobId = req.params.id;
-        const jobs = Job.get()
 
-        jobs = jobs.filter((job) => Number(job.id) !== Number(jobId));
+        Job.delete(jobId)
 
         return res.redirect("/");
     }
