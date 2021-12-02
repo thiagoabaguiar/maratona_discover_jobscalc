@@ -2,7 +2,8 @@ const Profile = require("../model/Profile")
 
 module.exports = {
   index(req, res) {
-    return res.render("profile", { profile: Profile.get() });
+    const profile = Profile.get()
+    return res.render("profile", { profile: profile });
   },
 
   update(req, res) {

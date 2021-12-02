@@ -1,24 +1,8 @@
 const Job = require("../model/Job")
 const Profile = require("../model/Profile")
-const jobUtils = require("../utils/JobUtils")
+const JobUtils = require("../utils/JobUtils")
 
 module.exports = {
-    index(req, res) {
-        const jobs = Job.get()
-        const profile = Profile.get()
-        const updatedJobs = jobs.map((job) => {
-            const remaining = jobUtils.remainingDays(job);
-            const status = remaining <= 0 ? "done" : "progress";
-            return {
-                ...job, // os ... irá 'espalhar' os atributos do job num novo objeto, sem necessidade de declarar um a um
-                remaining,
-                status,
-                budget: jobUtils.calculateBudget(job, profile["price-per-hour"]),
-            };
-        });
-        return res.render("index", { jobs: updatedJobs });
-    },
-
     view(req, res) {
         return res.render("job");
     },
@@ -33,7 +17,7 @@ module.exports = {
             return res.send("Job não encontrado!");
         }
 
-        job.budget = jobUtils.calculateBudget(job, profile["price-per-hour"]);
+        job.budget = JobUtils.calculateBudget(job, profile["price-per-hour"]);
 
         return res.render("job-edit", { job });
     },
