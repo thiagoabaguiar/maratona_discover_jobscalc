@@ -25,14 +25,14 @@ module.exports = {
     save(req, res) {
         const jobs = Job.get()
         const lastId = jobs[jobs.length - 1]?.id || 0; // trabalhando posição de array
-        jobs.push({
+        Job.save({
             // adiciona no array os valores do req.body, mas tbm poderia ser só jobs.push(job)
             id: lastId + 1,
             name: req.body.name,
             "daily-hours": req.body["daily-hours"],
             "total-hours": req.body["total-hours"],
             createdAt: Date.now(), // atribui o momento exato em formato timestamp
-        });
+        })
 
         return res.redirect("/"); // para finalizar o fluxo, retorna para o /
     },

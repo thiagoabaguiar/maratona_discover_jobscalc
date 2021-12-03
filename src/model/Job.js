@@ -22,6 +22,10 @@ module.exports = {
         return data
     },
 
+    save(newJob) {
+        data.push(newJob)
+    },
+
     update(newJob) {
         data = newJob
     },
