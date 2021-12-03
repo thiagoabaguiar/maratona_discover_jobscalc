@@ -32,13 +32,17 @@
           <img id="logo" src="/images/logo.svg" alt="Logo" />
           <span id="notification">
             <img src="/images/alert-octagon.svg" alt="Alerta" />            
-            <% switch (freeHours) {
-              case 0: %> Você não tem horas livres no seu dia! <% ;
-                break;
-              case 1: %> Você tem <%= freeHours %> hora livre no seu dia <% ;
-                break;
-              default: %> Você tem <%= freeHours %> horas livres no seu dia <% ;
-            } %>
+                <% if(freeHours >= 0){
+                    switch (freeHours) {
+                      case 0: %> Você não tem horas livres no seu dia! <% ;
+                        break;
+                      case 1: %> Você tem <%= freeHours %> hora livre no seu dia <% ;
+                        break;
+                      default: %> Você tem <%= freeHours %> horas livres no seu dia <% ;
+                    }
+                } else { 
+                  %> Você está com sobrecarga de horas! <%
+                } %> 
           </span>
           <a href="/profile" id="avatar-profile">
             <p><%= profile.name %>  <span>Ver perfil</span></p>
