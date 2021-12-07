@@ -3,9 +3,9 @@ const Profile = require("../model/Profile")
 const JobUtils = require("../utils/JobUtils")
 
 module.exports = {
-    index(req, res) {
-        const jobs = Job.get()
-        const profile = Profile.get()
+    async index(req, res) {
+        const jobs = await Job.get()
+        const profile = await Profile.get()
 
         let statusCount = {
             progress: 0,
@@ -18,7 +18,7 @@ module.exports = {
             const status = remaining <= 0 ? "done" : "progress";
             statusCount[status] += 1
 
-            hoursJobInProgress = (status === "progress") ? hoursJobInProgress + Number(job["daily-hours"]) : hoursJobInProgress
+            hoursJobInProgress = (status === "progress") ? hoursJobInProgress + Number(job.daily_hours) : hoursJobInProgress
 
             // if (status === "progress") {
             //     hoursJobInProgress = hoursJobInProgress + Number(job["daily-hours"])
@@ -29,11 +29,11 @@ module.exports = {
                 ...job, // os ... irá 'espalhar' os atributos do job num novo objeto, sem necessidade de declarar um a um
                 remaining,
                 status,
-                budget: JobUtils.calculateBudget(job, profile["price-per-hour"]),
+                budget: JobUtils.calculateBudget(job, profile.price_per_hour),
             };
         });
 
-        const freeHours = profile["hours-per-day"] - hoursJobInProgress
+        const freeHours = profile.hours_per_day - hoursJobInProgress
 
         return res.render("index", { jobs: updatedJobs, profile: profile, statusCount: statusCount, freeHours: freeHours });
     }

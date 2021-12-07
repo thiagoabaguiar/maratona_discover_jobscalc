@@ -1,18 +1,30 @@
-let data = {
-  name: "Thiago Aguiar",
-  avatar: "https://github.com/thiagoabaguiar.png",
-  "price-per-hour": 75,
-  "monthly-budget": 5000,
-  "days-per-week": 5,
-  "hours-per-day": 8,
-  "vacation-per-year": 4,
-};
+const Database = require("../db/config")
 
 module.exports = {
-  get() {
-    return data;
+
+  async get() {
+    const db = await Database()
+
+    const data = await db.get(`SELECT * FROM profile`)
+
+    await db.close()
+
+    return data
   },
-  update(newData) {
-    data = newData
+
+  async update(newData) {
+    const db = await Database()
+
+    db.run(`UPDATE profile SET
+        name = "${newData.name}",
+        avatar = "${newData.avatar}",
+        monthly_budget = ${newData.monthly_budget},
+        days_per_week = ${newData.days_per_week},
+        hours_per_day = ${newData.hours_per_day},
+        vacation_per_year = ${newData.vacation_per_year},
+        price_per_hour = ${newData.price_per_hour}
+    `)
+
+    await db.close()
   }
-};
+}
