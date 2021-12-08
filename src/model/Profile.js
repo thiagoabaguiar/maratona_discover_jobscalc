@@ -5,11 +5,11 @@ module.exports = {
   async get() {
     const db = await Database()
 
-    const data = await db.get(`SELECT * FROM profile`)
+    const profile = await db.get(`SELECT * FROM profile`)
 
     await db.close()
 
-    return data
+    return profile
   },
 
   async update(newData) {

@@ -9,11 +9,11 @@ const ProfileController = require("./controllers/ProfileController");
 // rotas
 routes.get("/", DashboardController.index);
 routes.get("/profile", ProfileController.index);
-routes.get("/job", JobController.view);
+routes.get("/job", JobController.index);
 routes.get("/job/:id", JobController.show);
 
 routes.post("/profile", ProfileController.update);
-routes.post("/job", JobController.save);
+routes.post("/job", JobController.add);
 routes.post("/job/:id", JobController.update);
 routes.post("/job/delete/:id", JobController.delete);
 

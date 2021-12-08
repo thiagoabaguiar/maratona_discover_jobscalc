@@ -4,7 +4,7 @@ const JobUtils = require("../utils/JobUtils")
 
 module.exports = {
     async index(req, res) {
-        const jobs = await Job.get()
+        const jobs = await Job.getAll()
         const profile = await Profile.get()
 
         let statusCount = {

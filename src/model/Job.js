@@ -3,45 +3,71 @@ const Database = require("../db/config")
 // let data = [];
 
 module.exports = {
-    async get() {
+    async getAll() { // OK
         const db = await Database()
 
-        const data = await db.all(`SELECT * FROM jobs`)
+        const allJobs = await db.all(`SELECT * FROM jobs`)
 
         await db.close()
 
-        return data
+        return allJobs
     },
 
-    save(newJob) {
-        data.push(newJob)
+    async getOnce(jobIdToGet){
+        const db = await Database()
+
+        const jobGot = await db.run(`
+            SELECT * FROM jobs
+            WHERE id = ${jobIdToGet}        
+        `)
+
+        await db.close()
+
+        return jobGot
     },
 
-    async update(newJob) {
+    async add(newJob) { // OK
         const db = await Database()
 
         db.run(`
-            UPDATE jobs SET
-                name = "${newJob.name}",
-                daily_hours = ${newJob.daily_hours},
-                total_hours = ${newJob.total_hours},
-                budget = ${newJob.budget},
-                created_at = ${newJob.created_at}
+            INSERT INTO jobs (
+                name,
+                daily_hours,
+                total_hours,
+                budget,
+                created_at 
+            ) VALUES (
+                "${newJob.name}",
+                ${newJob.daily_hours},
+                ${newJob.total_hours},
+                ${newJob.budget},
+                ${newJob.created_at} 
+            )
         `)
 
         await db.close()
     },
 
-    async delete(jobIdToDelete) {
+    async update(jobIdToUpdate,jobToUpdate) { // OK
         const db = await Database()
         
-        const allJobs = await db.all(`SELECT * FROM jobs`)
+        db.run(`
+            UPDATE jobs SET
+                name = "${jobToUpdate.name}",
+                daily_hours = ${jobToUpdate.daily_hours},
+                total_hours = ${jobToUpdate.total_hours}
+            WHERE id = ${jobIdToUpdate}
+        `)
 
-        const jobToDelete = allJobs.find((allJobs) => Number(jobIdToDelete) === Number(allJobs.id));
+        await db.close()
+    },
 
+    async delete(jobIdToDelete) { // OK
+        const db = await Database()
+        
         db.run(`
             DELETE FROM jobs
-            WHERE id = "${jobToDelete.id}"
+            WHERE id = "${jobIdToDelete}"
         `)
 
         await db.close()
