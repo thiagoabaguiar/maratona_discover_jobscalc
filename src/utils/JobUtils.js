@@ -10,5 +10,5 @@ module.exports = {
         return dayDiff
     },
     
-    calculateBudget: (job, pricePerHour) => job.total_hours * pricePerHour
+    // calculateBudget: (job, pricePerHour) => job.total_hours * pricePerHour
 }

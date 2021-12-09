@@ -37,10 +37,10 @@ module.exports = {
             daily_hours: Number(newJobFromFront.daily_hours),
             total_hours: Number(newJobFromFront.total_hours),
             budget: profile.price_per_hour * Number(newJobFromFront.total_hours),
-            created_at: Date.now()
+            created_at: Date.now() 
         }
         
-        Job.add(newJob)        
+        Job.add(newJob)
         
         // const jobs = await Job.get()
         // const lastId = jobs[jobs.length - 1]?.id || 0; // trabalhando posição de array

@@ -3,38 +3,33 @@ const Profile = require("../model/Profile")
 const JobUtils = require("../utils/JobUtils")
 
 module.exports = {
-    async index(req, res) {
-        const jobs = await Job.getAll()
+    async index(req, res) { // OK
+        const allJobs = await Job.getAll()
         const profile = await Profile.get()
 
         let statusCount = {
             progress: 0,
             done: 0,
-            total: jobs.length
+            total: allJobs.length
         }
+
         let hoursJobInProgress = 0
-        const updatedJobs = jobs.map((job) => {
+        const infoJobs = allJobs.map((job) => {
             const remaining = JobUtils.remainingDays(job);
             const status = remaining <= 0 ? "done" : "progress";
             statusCount[status] += 1
-
             hoursJobInProgress = (status === "progress") ? hoursJobInProgress + Number(job.daily_hours) : hoursJobInProgress
 
-            // if (status === "progress") {
-            //     hoursJobInProgress = hoursJobInProgress + Number(job["daily-hours"])
-            //     console.log(job["daily-hours"])
-            // }
-
             return {
-                ...job, // os ... irá 'espalhar' os atributos do job num novo objeto, sem necessidade de declarar um a um
+                ...job, // os ... irão 'espalhar' os atributos de cada job num novo objeto, sem necessidade de declarar um a um
                 remaining,
                 status,
-                budget: JobUtils.calculateBudget(job, profile.price_per_hour),
-            };
-        });
+                budget: job.budget,
+            }
+        })
 
         const freeHours = profile.hours_per_day - hoursJobInProgress
 
-        return res.render("index", { jobs: updatedJobs, profile: profile, statusCount: statusCount, freeHours: freeHours });
+        return res.render("index", { jobs: infoJobs, profile , statusCount, freeHours });
     }
 }
