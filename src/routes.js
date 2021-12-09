@@ -12,7 +12,7 @@ routes.get("/profile", ProfileController.index);
 routes.get("/job", JobController.index);
 routes.get("/job/:id", JobController.show);
 
-routes.post("/profile", ProfileController.update);
+routes.post("/profile", ProfileController.add);
 routes.post("/job", JobController.add);
 routes.post("/job/:id", JobController.update);
 routes.post("/job/delete/:id", JobController.delete);

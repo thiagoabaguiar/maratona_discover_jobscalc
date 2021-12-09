@@ -13,10 +13,10 @@ module.exports = {
         return allJobs
     },
 
-    async getOnce(jobIdToGet){
+    async getOnce(jobIdToGet){ // OK
         const db = await Database()
 
-        const jobGot = await db.run(`
+        const jobGot = await db.get(`
             SELECT * FROM jobs
             WHERE id = ${jobIdToGet}        
         `)

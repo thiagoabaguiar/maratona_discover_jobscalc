@@ -7,22 +7,16 @@ module.exports = {
         return res.render("job");
     },
 
-    async show(req, res) {
+    async show(req, res) { // OK
 
-        const jobIdToGet = req.params.id;
-        const jobGot = await Job.getOnce(jobIdToGet)
+        const jobIdToGet = req.params.id
+        const allJobs = await Job.getAll()
+        const jobGot = await Job.getOnce(jobIdToGet)    
 
-        const profile = await Profile.get()
-        
-        
-
-        const job = jobs.find((job) => Number(job.id) === Number(jobId));
-
+        const job = allJobs.find((job) => Number(job.id) === Number(jobIdToGet));
         if (!job) {
             return res.send("Job não encontrado!");
         }
-
-        job.budget = JobUtils.calculateBudget(job, profile.price_per_hour);
 
         return res.render("job-edit", { job: jobGot });
     },

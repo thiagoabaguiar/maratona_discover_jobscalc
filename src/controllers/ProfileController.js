@@ -1,25 +1,107 @@
 const Profile = require("../model/Profile")
+const ProfileUtils = require("../utils/ProfileUtils")
 
 module.exports = {
   async index(req, res) {
-    const profile = await Profile.get()
-    return res.render("profile", { profile: profile });
+
+    let profile = await Profile.get()
+    if (profile === undefined) {
+
+      profile = {
+        name: "",
+        avatar: "",
+        price_per_hour: 0,
+        monthly_budget: 0,
+        days_per_week: 0,
+        hours_per_day: 0,
+        vacation_per_year: 0
+      }
+      res.render("profile", { profile: profile })
+
+    } else {
+
+      return res.render("profile", { profile: profile });
+
+    }
   },
 
-  async update(req, res) {
-    const data = req.body;
-    const weeksPerYear = 52;
-    const weeksPerMonth = (weeksPerYear - data.vacation_per_year) / 12;
-    const weekTotalHours = data.hours_per_day * data.days_per_week;
-    const monthlyTotalHours = weeksPerMonth * weekTotalHours;
-    const valueHour = data.monthly_budget / monthlyTotalHours;
+  async add(req, res) {
 
-    await Profile.update({
-      ...await Profile.get(),
-      ...req.body,
-      price_per_hour: valueHour
-    })
-    
-    return res.redirect("/profile");
+    const profileDB = await Profile.get()
+    if (profileDB === undefined) {
+
+      const price_per_hour = ProfileUtils.calcPricePerHour( // calcula o valor-hora com base nos dados que vieram do front
+        Number(req.body.vacation_per_year),
+        Number(req.body.hours_per_day),
+        Number(req.body.days_per_week),
+        Number(req.body.monthly_budget)
+      )
+
+      const newProfile = {
+        name: req.body.name,
+        avatar: req.body.avatar,
+        price_per_hour: price_per_hour,
+        monthly_budget: Number(req.body.monthly_budget),
+        hours_per_day: Number(req.body.hours_per_day),
+        days_per_week: Number(req.body.days_per_week),
+        vacation_per_year: Number(req.body.vacation_per_year)
+      }
+
+      await Profile.add(newProfile)
+
+      res.redirect("/")
+
+    } else {
+
+      const price_per_hour = ProfileUtils.calcPricePerHour( // calcula o valor-hora com base nos dados que vieram do front
+        Number(req.body.vacation_per_year),
+        Number(req.body.hours_per_day),
+        Number(req.body.days_per_week),
+        Number(req.body.monthly_budget)
+      )
+
+      const newProfile = {
+        name: req.body.name,
+        avatar: req.body.avatar,
+        price_per_hour: price_per_hour,
+        monthly_budget: Number(req.body.monthly_budget),
+        hours_per_day: Number(req.body.hours_per_day),
+        days_per_week: Number(req.body.days_per_week),
+        vacation_per_year: Number(req.body.vacation_per_year)
+      }
+
+      if ( // valida se o que está vindo do front é diferente do que já estava no DB
+        profileDB.name != newProfile.name ||
+        profileDB.avatar != newProfile.avatar ||
+        profileDB.monthly_budget != newProfile.monthly_budget ||
+        profileDB.hours_per_day != newProfile.hours_per_day ||
+        profileDB.days_per_week != newProfile.days_per_week ||
+        profileDB.vacation_per_year != newProfile.vacation_per_year
+      ) {
+
+        await Profile.update(newProfile)
+
+      }
+
+      res.redirect("/")
+
+    }
   },
+
+  // async add(req, res) {
+  //   const newProfile = req.body;
+  //   const weeksPerYear = 52;
+  //   const weeksPerMonth = (weeksPerYear - newProfile.vacation_per_year) / 12;
+  //   const weekTotalHours = newProfile.hours_per_day * newProfile.days_per_week;
+  //   const monthlyTotalHours = weeksPerMonth * weekTotalHours;
+  //   const valueHour = newProfile.monthly_budget / monthlyTotalHours;
+
+  //   await Profile.update({
+  //     ...await Profile.get(),
+  //     ...req.body,
+  //     price_per_hour: valueHour
+  //   })
+
+  //   return res.redirect("/profile");
+  // },
 };
