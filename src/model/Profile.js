@@ -12,7 +12,7 @@ module.exports = {
     return profile
   },
 
-  async add(newProfile) {
+  async add(newProfile) { // OK
 
     const db = await Database()
 

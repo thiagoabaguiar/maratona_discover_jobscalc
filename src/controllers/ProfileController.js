@@ -2,7 +2,8 @@ const Profile = require("../model/Profile")
 const ProfileUtils = require("../utils/ProfileUtils")
 
 module.exports = {
-  async index(req, res) {
+
+  async index(req, res) { // OK
 
     let profile = await Profile.get()
     if (profile === undefined) {
@@ -25,7 +26,7 @@ module.exports = {
     }
   },
 
-  async add(req, res) {
+  async add(req, res) { // OK
 
     const profileDB = await Profile.get()
     if (profileDB === undefined) {
@@ -88,20 +89,4 @@ module.exports = {
     }
   },
 
-  // async add(req, res) {
-  //   const newProfile = req.body;
-  //   const weeksPerYear = 52;
-  //   const weeksPerMonth = (weeksPerYear - newProfile.vacation_per_year) / 12;
-  //   const weekTotalHours = newProfile.hours_per_day * newProfile.days_per_week;
-  //   const monthlyTotalHours = weeksPerMonth * weekTotalHours;
-  //   const valueHour = newProfile.monthly_budget / monthlyTotalHours;
-
-  //   await Profile.update({
-  //     ...await Profile.get(),
-  //     ...req.body,
-  //     price_per_hour: valueHour
-  //   })
-
-  //   return res.redirect("/profile");
-  // },
 };

@@ -1,7 +1,5 @@
 const Database = require("../db/config")
 
-// let data = [];
-
 module.exports = {
     async getAll() { // OK
         const db = await Database()
