@@ -46,16 +46,16 @@ module.exports = {
     async update(req, res) { // OK
 
         const profile = await Profile.get()
-        const jobIdToUpdate = req.params.id
-
+        
         const jobToUpdate = {
+            id: req.params.id,
             name: req.body.name,
             daily_hours: Number(req.body.daily_hours),
             total_hours: Number(req.body.total_hours),
             budget: profile.price_per_hour * Number(req.body.total_hours),
         }
 
-        await Job.update(jobIdToUpdate, jobToUpdate)
+        await Job.update(jobToUpdate)
 
         return res.redirect("/")
     },

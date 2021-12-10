@@ -47,7 +47,7 @@ module.exports = {
         await db.close()
     },
 
-    async update(jobIdToUpdate,jobToUpdate) { // OK
+    async update(jobToUpdate) { // OK
         const db = await Database()
         
         db.run(`
@@ -56,7 +56,7 @@ module.exports = {
                 daily_hours = ${jobToUpdate.daily_hours},
                 total_hours = ${jobToUpdate.total_hours},
                 budget = ${jobToUpdate.budget}
-            WHERE id = ${jobIdToUpdate}
+            WHERE id = ${jobToUpdate.id}
         `)
 
         await db.close()
