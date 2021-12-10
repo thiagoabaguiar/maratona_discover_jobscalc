@@ -16,7 +16,7 @@ module.exports = {
 
     const db = await Database()
 
-    db.exec(`INSERT INTO profile (
+    db.run(`INSERT INTO profile (
           name,
           avatar,
           price_per_hour,
