@@ -23,7 +23,7 @@ module.exports = {
       }
       else {
 
-        return res.render("/profile", { profile: profile })
+        return res.render("profile", { profile: profile })
 
       }
     },
