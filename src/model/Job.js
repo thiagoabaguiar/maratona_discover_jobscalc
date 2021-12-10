@@ -1,6 +1,7 @@
 const Database = require("../db/config")
 
 module.exports = {
+    
     async getAll() { // OK
         const db = await Database()
 
@@ -53,7 +54,8 @@ module.exports = {
             UPDATE jobs SET
                 name = "${jobToUpdate.name}",
                 daily_hours = ${jobToUpdate.daily_hours},
-                total_hours = ${jobToUpdate.total_hours}
+                total_hours = ${jobToUpdate.total_hours},
+                budget = ${jobToUpdate.budget}
             WHERE id = ${jobIdToUpdate}
         `)
 
